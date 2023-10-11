@@ -21,16 +21,27 @@ const getBody = (req, callback) => {
 };
 
 // here, you could declare one or more variables to store what comes back from the form.
-let item = "Enter something below.";
+let text = "What basic color do you like?";
+let color = "";
+let placeholder = ""
 
 // here, you can change the form below to modify the input fields and what is displayed.
 // This is just ordinary html with string interpolation.
 const form = () => {
   return `
-  <body>
-  <p>${item}</p>
+  <body style = "
+    background-color: ${color}; 
+    font-size:2em;
+    font: Garamond;
+    color: ${color === "black" || color === "navy" ? "white": "black"};
+    font-weight:800;
+    height: 100vh; 
+    width: 100vw; 
+    text-align:center;
+  ">
+  <p>${text}${color}</p>
   <form method="POST">
-  <input name="item"></input>
+  <input name="color" placeholder="${placeholder}"></input>
   <button type="submit">Submit</button>
   </form>
   </body>
@@ -42,12 +53,28 @@ const server = http.createServer((req, res) => {
   console.log("req.url is ", req.url);
   if (req.method === "POST") {
     getBody(req, (body) => {
+
       console.log("The body of the post is ", body);
       // here, you can add your own logic
-      if (body["item"]) {
-        item = body["item"];
+      
+      function isValidColor(color) {
+        const namedColors = /^(aqua|black|blue|fuchsia|gray|green|lime|maroon|navy|olive|orange|purple|red|silver|teal|white|yellow)$/i;
+        return namedColors.test(color);
+      }
+
+      if (body["color"]) {
+        if(isValidColor(body["color"])){
+          text = "Well here is a lot of "
+          color = body["color"].toLowerCase();
+          placeholder = "Another color?"
+        } else {
+          text = "I don't know that color, so you get "
+          color = "gray";
+          placeholder = "Another color?"
+        }
+
       } else {
-        item = "Nothing was entered.";
+        text = "Nothing was entered.";
       }
       // Your code changes would end here
       res.writeHead(303, {

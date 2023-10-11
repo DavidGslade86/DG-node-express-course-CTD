@@ -1,0 +1,1 @@
+console.log('I am writing something to the console');
