@@ -1,0 +1,24 @@
+Quickly explain how middleware is used in an Express application.
+##  Middleware in Node.js is a collection of functions and
+## methods that are used to process and manipulate data during 
+## the request-response cycle.  Middleware has access to the 
+## "req" and "res" objects involved in an API call and can be chained to
+## create more robust functionality when dealing with challenges
+## like authentication and error handling
+
+What does CRUD stand for?
+
+## C - Create R - Read U - Update D - Delete
+
+You are careful to store your sensitive information in a .env file:
+
+    How do you get your app to access the information in the .env file?
+
+## You can use the dotenv library.  Just require 'dotenv'.config() 
+## then access the .env variables with 'process.env.<variable_name>'
+
+    How do you protect the contents of the .env file so that it is not stored in your Github repository?
+
+## By default .env files are usually included in your .gitignore file, 
+## but you can and should double check to make sure that it is so your
+## .env file doesn't get pushed to Github
