@@ -1,72 +1,45 @@
 const express = require('express')
-
+const peopleRouter = require('./routes/people.js');
+const authRouter = require('./routes/authorization.js')
 const app = express();
-const {products} = require("./data.js");
-const { is } = require('express/lib/request.js');
+const cookieParser = require('cookie-parser');  
 
-app.use(express.static('./public'));
+const logger = (req, res, next)=> {
+    const method = req.method;
+    const url = req.url;
+    const time = new Date ();
 
-app.get('/api/v1/test', (req, res) => {
-    res.json({message: "It worked!"});
-})
+    console.log(method, url, time);
+     next();
+}
 
-app.get('/api/v1/products', (req, res) => {
-    res.json(products);
-})
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+app.use(cookieParser());
+app.use(logger);
+app.use(express.static('./methods-public'));
+app.use('/api/v1/people', peopleRouter)
+app.use('', authRouter)
 
-app.get('/api/v1/products/:productID', (req, res) => {
-    const idToFind = parseInt(req.params.productID);
-    const product = products.find((p => p.id === idToFind));
-
-    if(!product) {
-        return res.status(404).json({message: "That product was not found."})
-    }
-
-    return res.json(product);
-})
-
-app.get('/api/v1/query', (req, res) => {
-    const { search, limit, price } = req.query;
-
-    const isValidRegEx = (userInput) => {
-        try {
-            new RegExp(userInput);
-            return true;
-        } catch (e) {
-            return false;
-        }
-    };
-
-    let sortedProducts = products;
-
-    // Search filter
-    if (search) {
-        
-        sortedProducts = sortedProducts.filter((product) => product.name.startsWith(search));
-
-        if (sortedProducts.length ===0 && isValidRegEx(search)) {
-            sortedProducts = products;
-            const regex = new RegExp(search, "i");
-            sortedProducts = sortedProducts.filter((product) => regex.test(product.name));
-        } 
-    }
-
-    // Price filter
-    if (price) {
-        sortedProducts = sortedProducts.filter((product) => product.price <= price);
-    }
-
-    // Limit filter
-    if (limit) {
-        sortedProducts = sortedProducts.slice(0, Number(limit));
-    }
-
-    if (sortedProducts.length === 0) {
-        return res.status(404).json({ message: "No products matched your query." });
-    }
-
-    res.status(200).json(sortedProducts);
+/*
+app.get('/api/v1/people', (req, res) => {
+    res.status(200).json(people);
 });
+
+app.post('/api/v1/people',(req, res)=> {
+    console.log(req.body)
+    const name = req.body.name
+    if(name){
+        people.push({
+            id : people.length + 1, 
+            name: name
+        });
+        return res.status(201).json({ success: true, name: req.body.name });
+    }
+
+    res.status(400).json({ success: false, message: "Please provide a name" });
+})
+*/
 
 app.all('*', (req, res) => {
     res.status(404).send('resource not found');
